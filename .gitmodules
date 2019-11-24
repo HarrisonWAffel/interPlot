@@ -1,0 +1,3 @@
+[submodule "zannotate"]
+	path = zannotate
+	url = https://github.com/zmap/zannotate.git
