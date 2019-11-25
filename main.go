@@ -2,14 +2,14 @@ package main
 
 import (
 	"./zan"
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
+	"github.com/golang/geo/s2"
 	"image/color"
 	"os"
-
-	"github.com/golang/geo/s2"
 	"os/exec"
 	"strings"
 )
@@ -62,14 +62,37 @@ func main() {
 //scanInternet runs the zmap command and outputs a csv file
 func scanInternet() {
 	fmt.Println("Scanning")
-	cmd := "zmap"
+	cm := "zmap"
 	args := []string{"-B", "10M", "-p", "80", "-n", "10000", "-o", "results.csv"}
-	if err := exec.Command(cmd, args...).Run(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+
+	cmd := exec.Command(cm, args...)
+	//We need to create a reader for the stdout of this script
+	cmdReader, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Println("Error creating StdoutPipe for Cmd", err)
 		os.Exit(1)
 	}
-	fmt.Println("Finished Scanning. ")
-	zannote()
+
+	//A scanner is created to read the stdout of the above command
+	scanner := bufio.NewScanner(cmdReader)
+
+	//A new go thread is created to handle the output
+	go func() {
+		fmt.Print("ok")
+		for scanner.Scan() {
+
+			fmt.Println(scanner.Text())
+		}
+	}()
+
+	//We need to start our goroutine from the main thread
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println("Error starting Cmd", err)
+		os.Exit(1)
+	}
+	fmt.Print(scanner.Text())
+	//zannote()
 }
 
 //zan is a command line tool that is used to find the lat long position of each ip.
