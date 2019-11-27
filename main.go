@@ -1,7 +1,6 @@
 package main
 
 import (
-	"./zan"
 	"bufio"
 	"encoding/json"
 	"fmt"
@@ -63,7 +62,7 @@ func main() {
 func scanInternet() {
 	fmt.Println("Scanning")
 	cm := "zmap"
-	args := []string{"-B", "10M", "-p", "80", "-n", "10000", "-o", "results.csv"}
+	args := []string{"-B", "200M", "-p", "21", "-n", "7000000", "-o", "results.csv"}
 
 	cmd := exec.Command(cm, args...)
 	//We need to create a reader for the stdout of this script
@@ -75,7 +74,7 @@ func scanInternet() {
 
 	//A scanner is created to read the stdout of the above command
 	scanner := bufio.NewScanner(cmdReader)
-
+	defer cmdReader.Close()
 	//A new go thread is created to handle the output
 	go func() {
 		fmt.Print("ok")
@@ -92,12 +91,12 @@ func scanInternet() {
 		os.Exit(1)
 	}
 	fmt.Print(scanner.Text())
-	//zannote()
+	getIpLocations()
 }
 
 //zan is a command line tool that is used to find the lat long position of each ip.
-func zannote() {
-	zan.GetLocs()
+func getIpLocations() {
+
 	plotPoints(createIps())
 }
 
