@@ -129,29 +129,29 @@ func getIpLocations() {
 		fmt.Print(total)
 		fmt.Println(" Ip addresses")
 
-		go func() {
-			response, err := netClient.Get("http://api.ipstack.com/" + e + "?access_key=" + ApiKey + "&output=json")
+		//go func() {
+		response, err := netClient.Get("http://api.ipstack.com/" + e + "?access_key=" + ApiKey + "&output=json")
+		if err != nil {
+			fmt.Println("bad APi connection reported")
+		}
+		defer response.Body.Close()
+		if response.StatusCode == http.StatusOK {
+			bodyBytes, err := ioutil.ReadAll(response.Body)
 			if err != nil {
-				fmt.Println("bad APi connection reported")
+				log.Fatal(err)
 			}
-			defer response.Body.Close()
-			if response.StatusCode == http.StatusOK {
-				bodyBytes, err := ioutil.ReadAll(response.Body)
-				if err != nil {
-					log.Fatal(err)
-				}
 
-				ip := Ip{}
-				e := json.Unmarshal(bodyBytes, &ip)
-				if e != nil {
-					fmt.Println(e)
+			ip := Ip{}
+			e := json.Unmarshal(bodyBytes, &ip)
+			if e != nil {
+				fmt.Println(e)
 
-				}
-
-				ips = append(ips, ip)
 			}
-			return
-		}()
+
+			ips = append(ips, ip)
+		}
+		//	return
+		//}()
 
 	}
 
