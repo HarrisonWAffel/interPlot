@@ -24,7 +24,7 @@ You will also need to create your own [IP Stack API Key](https://ipstack.com/pla
 
 Resulting Map 
 ---
-Thanks to the awesome [Go-staticmaps](https://github.com/flopp/go-staticmaps) project developed by [flopp](https://github.com/flopp) the program outputs a great looking map of the world. Here is the result of a 20M scan for a 7000 addresses, of which 962 were located. 
+Thanks to the awesome [Go-staticmaps](https://github.com/flopp/go-staticmaps) project developed by [flopp](https://github.com/flopp) the program outputs a great looking map of the world. Here is an example of a scan that turned up a few located IP addresses. 
 
 
 ![Alt text](my-map.png?raw=true "Example Map")
