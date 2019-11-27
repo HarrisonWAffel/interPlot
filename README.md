@@ -22,6 +22,13 @@ This application relies on the [ZMap](https://github.com/zmap/zmap) network util
 
 You will also need to create your own [IP Stack API Key](https://ipstack.com/plan). It's free and doesn't require a credit card to use. Once you have your key, open `main.go` and paste it into the const variable `ApiKey`  within `main.go`. 
 
+Resulting Map 
+---
+Thanks to the awesome [Go-staticmaps](https://github.com/flopp/go-staticmaps) project developed by [flopp](https://github.com/flopp) the program outputs a great looking map of the world. Here is the result of a 20M scan for a 7000 addresses, of which 962 were located. 
+
+
+![Alt text](my-map.png?raw=true "Example Map")
+
 
 #### A Word Of Caution
 As mentioned before, the networking tool used to undertake these IP scans can destroy bandwidth speeds and cripple a network. This project has the scan speed limited to 20Mbps, however this may be aggresive for some areas. To change this value modify the second argument of the zmap exec process call, to whatever value you desire. 
