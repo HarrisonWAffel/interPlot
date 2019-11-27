@@ -150,7 +150,7 @@ func getIpLocations() {
 
 			ips = append(ips, ip)
 		}
-		//	return
+		//	return.
 		//}()
 
 	}
