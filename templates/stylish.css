@@ -1,0 +1,77 @@
+
+.sidenav {
+    height: 100%;
+    width: 460px;
+    position: fixed;
+    z-index: 1;
+    text-align: center;
+    top: 0;
+    left: 0;
+    background-color: #bc4543;
+    overflow-x: hidden;
+
+}
+
+.title{
+    color: white;
+    position: relative;
+    font-size: 80px;
+}
+
+.formName {
+    text-align: center;
+    width: 90px;
+    position: relative;
+    padding-top: 10px;
+    float: left;
+    align-content: center;
+    color: black;
+}
+
+
+.button {
+    font-size: 25px;
+}
+
+.image {
+
+    position: relative;
+    z-index: 1;
+    text-align: right;
+    top: 5%;
+    left: 28%;
+    z-index: 0;
+
+    background-color: #bc4543;
+
+}
+.sidenav form {
+    text-decoration: none;
+    float:right;
+    padding-right: 15px;
+    padding-top: 20px;
+    color: #000000;
+    display: inline-block;
+}
+
+.sidenav div {
+    padding-bottom: 35px;
+}
+
+.sidenav input {
+    margin-top: 200px;
+}
+
+.sidenav textarea {
+    resize: none;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.main {
+    margin-left: 160px; /* Same as the width of the sidenav */
+    font-size: 28px; /* Increased text to enable scrolling */
+    padding: 0px 10px;
+}

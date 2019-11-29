@@ -27,7 +27,7 @@ Resulting Map
 Thanks to the awesome [Go-staticmaps](https://github.com/flopp/go-staticmaps) project developed by [flopp](https://github.com/flopp) the program outputs a great looking map of the world. Here is the result of a 20M scan for a 7000 addresses, of which 962 were located. 
 
 
-![Alt text](my-map.png?raw=true "Example Map")
+![Alt text](goodexample.png?raw=true "Example Map")
 
 
 #### A Word Of Caution
