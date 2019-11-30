@@ -4,37 +4,79 @@
     <meta charset="UTF-8">
     <title>InterPlot</title>
     <link href="stylish.css" rel="stylesheet">
+    <script>
+
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function updateLog() {
+
+                fetch('http://localhost:8080/getzmap')
+                    .then(response => response.text())
+                    .then(data => {
+                        if(data !== "No Scan Active"){
+                            var container = document.getElementById("cat");
+                            container.innerHTML = data;
+                        }
+                    })
+                    .catch(error => console.log('error is', error));
+
+        }
+
+        setInterval(updateLog, 1000);
+        updateLog();
+
+    </script>
 </head>
 <body>
 
 
-
+<img src="output.png"  alt="Expected output of network scan visualization" >
 
 <div class="sidenav" >
 
     <p class="title"> InterPlot</p>
 
-    <p class="formName">Speed Limit in Mbps</p>
-    <form action="/scan" method="POST" >
-        <div>
-            <textarea  name="speedLimit" rows="2" cols="50">
-
-            </textarea>
-        </div>
+    <div class="forms">
 
 
-        <div>
+
+        <div class="formNames">
+            <p class="formName">Speed Limit in Mbps</p>
             <p class="formName">Number of connection attempts</p>
-            <textarea  name="connNum" rows="2" cols="50">
-
-            </textarea>
         </div>
-        <input  type="submit" value="Start Scan" style="margin-top: -90%" >
-    </form>
+
+        <form action="/scan" method="POST" >
+            <div>
+                <textarea  name="SpeedLimit" rows="1" cols="50"></textarea>
+            </div>
+
+            <div>
+                <textarea  name="connNum" rows="1" cols="50"></textarea>
+            </div>
+            <input type="submit" value="Starts Scan" style="margin-top: -90%" >
+        </form>
+
+
+
+        <form action="/stop" style="margin-top: 25%; ">
+            <input  type="submit" value="Stops Scan"  >
+
+            <p class="cat" id = "cat"  >
+
+            </p>
+        </form>
+
+
+
+
+    </div>
 </div>
 
 
-<img src="output.png" class="image">
+
 
 
 

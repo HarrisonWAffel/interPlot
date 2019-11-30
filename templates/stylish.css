@@ -9,7 +9,6 @@
     left: 0;
     background-color: #bc4543;
     overflow-x: hidden;
-
 }
 
 .title{
@@ -21,11 +20,21 @@
 .formName {
     text-align: center;
     width: 90px;
+}
+
+.formNames{
+    width: 90px;
+    position: absolute;
+}
+
+.forms{
+    height: 40%;
+}
+
+.cat {
     position: relative;
-    padding-top: 10px;
-    float: left;
-    align-content: center;
-    color: black;
+    width: 460px;
+    border: solid 1px;
 }
 
 
@@ -34,22 +43,20 @@
 }
 
 .image {
-
-    position: relative;
-    z-index: 1;
-    text-align: right;
-    top: 5%;
-    left: 28%;
-    z-index: 0;
-
-    background-color: #bc4543;
+    height: 250px;
+    left: 50%;
+    margin-top: -125px;
+    margin-left: -125px;
+    position: absolute;
+    top: 50%;
+    width: 250px;
 
 }
 .sidenav form {
     text-decoration: none;
     float:right;
     padding-right: 15px;
-    padding-top: 20px;
+    padding-top: 25px;
     color: #000000;
     display: inline-block;
 }
@@ -71,7 +78,7 @@
 }
 
 .main {
-    margin-left: 160px; /* Same as the width of the sidenav */
+    margin-left: 460px; /* Same as the width of the sidenav */
     font-size: 28px; /* Increased text to enable scrolling */
-    padding: 0px 10px;
+
 }
