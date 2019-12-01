@@ -32,6 +32,6 @@ func plotPoints(ips []freegeoip.DefaultQuery) {
 	if err := gg.SavePNG("templates/output.png", img); err != nil {
 		panic(err)
 	}
-	log.Println("Imaged Saved! Refreshing.")
+	log.Println("Imaged Saved! Done.")
 
 }

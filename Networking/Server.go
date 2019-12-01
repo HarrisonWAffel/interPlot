@@ -1,13 +1,12 @@
 package Networking
 
 import (
-	"bufio"
+	"context"
 	"html/template"
 	"io/ioutil"
-	"strings"
-
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Webpage struct {
@@ -17,7 +16,7 @@ type Webpage struct {
 	Content     []byte
 }
 
-var ZmapOutput bufio.Scanner
+var ctx context.Context
 
 //loadPage loads our index.html and returns its contents as a data structure.
 func loadPage() (*Webpage, error) {
@@ -31,14 +30,11 @@ func loadPage() (*Webpage, error) {
 	return &Webpage{Title: "InterPlot", SpeedLimit: 0, NumberOfIps: 0, Content: []byte(html)}, nil
 }
 
-//save page saves the content of index.html as a .txt file. This function will be deprecated soon.
-func (p *Webpage) savePage() error {
-	filename := p.Title + ".txt"
-	return ioutil.WriteFile(filename, p.Content, 0600)
-}
+//  Handlers ///
 
 //viewHandler serves index.html to our http requester
 func viewHandler(w http.ResponseWriter, r *http.Request) {
+
 	p, err := loadPage()
 	if err != nil {
 		log.Fatal("Could not load html")
@@ -47,51 +43,61 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/index.html")
 	if err != nil {
 		log.Println()
-		log.Panic("T is NULL")
+		log.Panic("cannot create index template")
 	}
+
 	t.Execute(w, p)
+
 }
 
-//scanHandler starts the zmap scan when the user is redirected to /scan. Can be started through the GUI or through the API header values.
+//scanHandler is a handler function that returns the index webpage after starting a zmap scan.
+//It can be started either by visiting the website endpoint, or by sending the parmeters in its header
 func scanHandler(w http.ResponseWriter, r *http.Request) {
 
-	if r.FormValue("SpeedLimit") != "" && r.FormValue("connNum") != "" {
+	headerScanLimit := w.Header().Get("SpeedLimit")
+	headerNum := w.Header().Get("connNum")
 
-		go scanInternet(r.FormValue("SpeedLimit"), r.FormValue("connNum"))
+	speedLimit := r.FormValue("SpeedLimit")
+	connNum := r.FormValue("connNum")
 
-	} else if r.Header.Get("speedLimit") != "" && r.Header.Get("connNum") != "" {
-
-		go scanInternet(r.Header.Get("speedLimit"), r.Header.Get("connNum"))
-		w.Write([]byte("Scan Started."))
-
-	} else {
-		log.Println(r.FormValue("SpeedLimit"))
-		log.Println(r.FormValue("connNum"))
-		log.Println("The form values were empty")
-		w.Write([]byte("Form values empty"))
-
+	if headerScanLimit != "" && headerNum != "" {
+		ScanInternet(nil, headerScanLimit, headerNum)
+	} else if speedLimit != "" && connNum != "" {
+		ScanInternet(nil, speedLimit, connNum)
 	}
+
 	viewHandler(w, r)
 }
 
-func getzmap(w http.ResponseWriter, r *http.Request) {
-	o := ListenToScan()
-	w.Write([]byte(o))
+/// API ///
+
+func scanOutput(w http.ResponseWriter, r *http.Request) {
+	_, e := w.Write([]byte(ListenToScan()))
+	if e != nil {
+		log.Println("Could not listen to scan")
+		log.Fatal(e)
+	}
 }
 
-func stopHandler(w http.ResponseWriter, r *http.Request) {
-	StopScan()
-	viewHandler(w, r)
+func listFoundIPS(w http.ResponseWriter, r *http.Request) {
+
+	o, e := ioutil.ReadFile("results.csv")
+	if e != nil {
+		w.Write([]byte("No IPS Located"))
+	}
+	ips := string(o)
+
+	w.Write([]byte(ips))
 }
 
 //startserver launches the handlers required for our server and its API.
 func StartServer() {
-
+	ctx = context.Background()
 	log.Println("Starting Server...")
 	http.Handle("/", http.FileServer(http.Dir("./templates")))
 	http.HandleFunc("/scan", scanHandler)
-	http.HandleFunc("/stop", stopHandler)
-	http.HandleFunc("/getzmap", getzmap)
+	http.HandleFunc("/scanoutput", scanOutput)
+	http.HandleFunc("/listfoundips", listFoundIPS)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }

@@ -16,7 +16,12 @@
     position: relative;
     font-size: 80px;
 }
+.ips{
+    text-align: center;
+    margin-top: 15%;
+    border: solid 1px;
 
+}
 .formName {
     text-align: center;
     width: 90px;
@@ -28,7 +33,7 @@
 }
 
 .forms{
-    height: 40%;
+    height: 10%;
 }
 
 .cat {
@@ -52,14 +57,15 @@
     width: 250px;
 
 }
-.sidenav form {
+.sidenav form  {
     text-decoration: none;
     float:right;
-    padding-right: 15px;
+    padding-right: 0px;
     padding-top: 25px;
     color: #000000;
     display: inline-block;
 }
+
 
 .sidenav div {
     padding-bottom: 35px;

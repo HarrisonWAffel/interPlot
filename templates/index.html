@@ -11,15 +11,25 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        function updateLog() {
+        function redirect(){
+            window.location.replace("http://localhost:8080/index.html/");
+        }
 
-                fetch('http://localhost:8080/getzmap')
+        function updateLog() {
+                if (window.location.href.includes("/scan")){
+                    redirect()
+                }
+                fetch('http://localhost:8080/scanoutput')
                     .then(response => response.text())
                     .then(data => {
-                        if(data !== "No Scan Active"){
-                            var container = document.getElementById("cat");
-                            container.innerHTML = data;
+
+                        var container = document.getElementById("cat");
+                        container.innerHTML = data;
+                        if (data.includes("100%") || data.includes("99%")){
+                            redirect()
                         }
+
+                        console.log(data)
                     })
                     .catch(error => console.log('error is', error));
 
@@ -27,6 +37,29 @@
 
         setInterval(updateLog, 1000);
         updateLog();
+
+        var pass = false;
+
+        function updateFoundIPS(){
+            if (document.getElementById("ips") != null ) {
+                if (document.getElementById("ips").innerText === "" || pass ) {
+                    fetch("http://localhost:8080/listfoundips")
+                        .then(response => response.text())
+                        .then(data => {
+                            var container = document.getElementById("ips");
+                            container.innerText = data
+                            pass=false;
+                        }).catch(err => console.log(err))
+                }
+            }
+        }
+        function refreshIPS(){
+            pass=true;
+        }
+        setInterval(updateFoundIPS, 1000);
+        setInterval(refreshIPS, 10000);
+        refreshIPS()
+        updateFoundIPS();
 
     </script>
 </head>
@@ -56,22 +89,21 @@
             <div>
                 <textarea  name="connNum" rows="1" cols="50"></textarea>
             </div>
-            <input type="submit" value="Starts Scan" style="margin-top: -90%" >
+            <input type="submit" value="Start Scan" style="margin-top: -90%" >
         </form>
 
 
-
-        <form action="/stop" style="margin-top: 25%; ">
-            <input  type="submit" value="Stops Scan"  >
-
+        <form class = "output">
             <p class="cat" id = "cat"  >
 
             </p>
         </form>
 
-
-
-
+    </div>
+    <div>
+        <p class="ips" id = "ips"  >
+            .
+        </p>
     </div>
 </div>
 

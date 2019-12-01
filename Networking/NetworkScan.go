@@ -2,6 +2,7 @@ package Networking
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"github.com/fiorix/freegeoip"
 
@@ -12,7 +13,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"syscall"
 	"time"
 )
 
@@ -21,22 +21,24 @@ const ApiKey = "959279e06d5ca3430cf26fdbca17ea7c"
 var scanner *bufio.Scanner
 var cmd *exec.Cmd
 var stdin io.WriteCloser
+var scanning bool
 
 //scanInternet runs the zmap command and outputs a csv file
-func scanInternet(speedLimit string, n string) {
+func ScanInternet(ctx context.Context, speedLimit string, n string) {
 
-	if scanner == nil {
-		fmt.Println("Scanning")
+	if scanning == false {
+		scanning = true
+		log.Println("Scanning")
 		cm := "zmap"
 
-		args := []string{"-B", strings.TrimSpace(speedLimit) + "M", "-p", "21", "-n", strings.TrimSpace(n), "-o", "results.csv"}
+		args := []string{"-B", strings.TrimSpace(speedLimit) + "M", "-p", "80", "-n", strings.TrimSpace(n), "-o", "results.csv"}
 		fmt.Println(args)
 		cmd = exec.Command(cm, args...)
 
 		//We need to create a reader for the stderr of this script
 		cmdReader, err := cmd.StderrPipe()
 		if err != nil {
-			fmt.Println("Error creating StdoutPipe for Cmd", err)
+			fmt.Println("Error creating StderrPipe for Cmd", err)
 			os.Exit(1)
 		}
 
@@ -47,11 +49,10 @@ func scanInternet(speedLimit string, n string) {
 			log.Fatal("Cannot get stdin pipe ")
 		}
 		stdin = stdn
-		//A scanner is created to read the stdout of the above command
+
+		//A scanner is created to read the stderr of the above command
 		scanner = bufio.NewScanner(cmdReader)
 
-		//A new go thread is created to handle the output
-		//fmt not log
 		go func() {
 			for scanner.Scan() {
 				fmt.Println(scanner.Text())
@@ -59,25 +60,14 @@ func scanInternet(speedLimit string, n string) {
 			return
 		}()
 
-		log.Println("Started scan")
-
-		//We need to start our goroutine from the main thread
 		err = cmd.Run()
 		if err != nil {
 			log.Fatal("Error starting Cmd ", err)
 		}
 		scanner = nil
 		GetIpLocationsFromAPI()
+
 	}
-}
-
-func StopScan() {
-
-	e := cmd.Process.Signal(syscall.SIGINT)
-	if e != nil {
-		log.Fatal("Cannot sigint ")
-	}
-
 }
 
 //ListenToScan returns the last line of the current scan.
@@ -89,6 +79,14 @@ func ListenToScan() string {
 		}
 	}
 	return "No Scan Active"
+}
+
+func StopScan() {
+	o, e := stdin.Write([]byte("^c"))
+	if e != nil {
+		log.Println(e)
+	}
+	log.Println(o)
 }
 
 //getIpLocationsFromAPI is a function that utilizes the ipstack api for ip geolocation. It utilizes a simple curl command to get a json response body containing the desired information.
