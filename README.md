@@ -11,7 +11,7 @@ Future Goals
 + Server functionality to allow for continuous mapping 
 + - [x] A more sustainable API solution which scales more readily
 + - [x] A web client to act as the server interface
-+ Document the API calls more heavily.
++ Document the API calls more heavily and undertake best practices for a golang server.
 
 
 Setup
@@ -37,15 +37,13 @@ For example,
 
 A scan limited to 2 Mbps would look like such
 
-        args := []string{"-B", "2M", "-p", "21", "-n", "700", "-o", "test.csv"}
+      args := []string{"-B", "2M", "-p", "21", "-n", "700", "-o", "test.csv"}
 
 If we wanted to increase that limit to 20 Mbps it would be changed to 
 
 	args := []string{"-B", "20M", "-p", "21", "-n", "700", "-o", "test.csv"}
 	
 <br/>
-
-It should also be noted that the free tier on the IP Stack API will not support a full scan of the IPv4 address space. 	
 	
 	
 ---
