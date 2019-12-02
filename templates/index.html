@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>InterPlot</title>
+    <link href="stylish.css" rel="stylesheet">
+    <script>
+
+
+        function redirect(){
+            window.location.replace("http://localhost:8080/index.html/");
+        }
+
+        function updateLog() {
+                if (window.location.href.includes("/scan")){
+                    redirect()
+                }
+                fetch('http://localhost:8080/scanoutput')
+                    .then(response => response.text())
+                    .then(data => {
+
+                        var container = document.getElementById("cat");
+                        container.innerHTML = data;
+                        if (data.includes("100%") || data.includes("99%")){
+                            redirect()
+                        }
+
+                        console.log(data)
+                    })
+                    .catch(error => console.log('error is', error));
+
+        }
+
+        setInterval(updateLog, 1000);
+        updateLog();
+
+        var pass = false;
+
+        function updateFoundIPS(){
+            if (document.getElementById("ips") != null ) {
+                if (document.getElementById("ips").innerText === "" || pass ) {
+                    fetch("http://localhost:8080/listfoundips")
+                        .then(response => response.text())
+                        .then(data => {
+                            var container = document.getElementById("ips");
+                            container.innerText = data
+                            pass=false;
+                        }).catch(err => console.log(err))
+                }
+            }
+        }
+
+        function refreshIPS(){
+            pass=true;
+        }
+
+
+
+
+
+        document.getElementById("map").src="templates/output.png";
+        setInterval(updateFoundIPS, 1000);
+        setInterval(refreshIPS, 10000);
+        refreshIPS()
+        updateFoundIPS();
+
+
+    </script>
+</head>
+<body>
+
+
+<img src="output%3Frandom=323527528432525.24234.png" id="map" alt="Expected output of network scan visualization" >
+
+<div class="sidenav" >
+
+    <p class="title"> InterPlot</p>
+
+    <div class="forms">
+
+
+
+        <div class="formNames">
+            <p class="formName">Speed Limit in Mbps</p>
+            <p class="formName">Number of connection attempts</p>
+        </div>
+
+        <form action="/scan" method="POST" >
+            <div>
+                <textarea  name="SpeedLimit" rows="1" cols="50"></textarea>
+            </div>
+
+            <div>
+                <textarea  name="connNum" rows="1" cols="50"></textarea>
+            </div>
+            <input type="submit" value="Start Scan" style="margin-top: -90%" >
+        </form>
+
+
+        <form class = "output">
+            <p class="cat" id = "cat"  >
+
+            </p>
+        </form>
+
+    </div>
+    <div>
+        <p class="ips" id = "ips"  >
+            .
+        </p>
+    </div>
+</div>
+
+
+
+
+
+
+</body>
+</html>
