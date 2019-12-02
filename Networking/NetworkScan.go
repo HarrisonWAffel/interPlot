@@ -126,6 +126,6 @@ func GetIpLocationsFromAPI() {
 
 		queryResults[i] = result
 	}
-
+	scanning = false
 	plotPoints(queryResults)
 }

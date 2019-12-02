@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 )
 
@@ -90,6 +91,32 @@ func listFoundIPS(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(ips))
 }
 
+func getImg(w http.ResponseWriter, r *http.Request) {
+	files, err := ioutil.ReadDir("./templates")
+	if err != nil {
+		log.Fatal(err)
+	}
+	x := 0
+	for _, file := range files {
+		if strings.Contains(file.Name(), "output") {
+			x++
+		}
+		log.Println(file.Name())
+	}
+	var output_files = make([]string, x)
+	k := 0
+	for _, file := range files {
+		if strings.Contains(file.Name(), "output") {
+			output_files[k] = file.Name()
+			k++
+		}
+	}
+
+	sort.Strings(output_files)
+	log.Println(output_files[len(output_files)-1])
+	w.Write([]byte(output_files[len(output_files)-1]))
+}
+
 //startserver launches the handlers required for our server and its API.
 func StartServer() {
 	ctx = context.Background()
@@ -98,6 +125,7 @@ func StartServer() {
 	http.HandleFunc("/scan", scanHandler)
 	http.HandleFunc("/scanoutput", scanOutput)
 	http.HandleFunc("/listfoundips", listFoundIPS)
+	http.HandleFunc("/img", getImg)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }

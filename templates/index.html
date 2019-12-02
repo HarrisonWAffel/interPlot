@@ -7,10 +7,6 @@
     <script>
 
 
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
         function redirect(){
             window.location.replace("http://localhost:8080/index.html/");
         }
@@ -53,20 +49,28 @@
                 }
             }
         }
+
         function refreshIPS(){
             pass=true;
         }
+
+
+
+
+
+        document.getElementById("map").src="templates/output.png";
         setInterval(updateFoundIPS, 1000);
         setInterval(refreshIPS, 10000);
         refreshIPS()
         updateFoundIPS();
+
 
     </script>
 </head>
 <body>
 
 
-<img src="output.png"  alt="Expected output of network scan visualization" >
+<img src="output%3Frandom=323527528432525.24234.png" id="map" alt="Expected output of network scan visualization" >
 
 <div class="sidenav" >
 
