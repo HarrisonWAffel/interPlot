@@ -7,10 +7,10 @@ But beware, the tool can eat up almost all of your bandwidth if you let it.  The
 Future Goals
 ---
 
-+ Region specific scans 
++  Region specific scans 
 + Server functionality to allow for continuous mapping 
-+ A more sustainable API solution which scales more readily
-+ A web client to act as the server interface
++ - [x] A more sustainable API solution which scales more readily
++ - [x] A web client to act as the server interface
 + Document the API calls more heavily.
 
 
@@ -37,7 +37,7 @@ For example,
 
 A scan limited to 2 Mbps would look like such
 
-    args := []string{"-B", "2M", "-p", "21", "-n", "700", "-o", "test.csv"}
+        args := []string{"-B", "2M", "-p", "21", "-n", "700", "-o", "test.csv"}
 
 If we wanted to increase that limit to 20 Mbps it would be changed to 
 
@@ -53,4 +53,4 @@ External Repositories / APIs used within this project
 
 [Go-staticmaps](https://github.com/flopp/go-staticmaps), Developed by [flopp](https://github.com/flopp)
 
-[IP Stack ](https://ipstack.com/) IP Geolocation API
+
