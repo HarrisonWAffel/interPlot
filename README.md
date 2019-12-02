@@ -11,7 +11,7 @@ Future Goals
 + Server functionality to allow for continuous mapping 
 + A more sustainable API solution which scales more readily
 + A web client to act as the server interface
-	
++ Document the API calls more heavily.
 
 
 Setup
@@ -20,7 +20,7 @@ This application relies on the [ZMap](https://github.com/zmap/zmap) network util
 
 `go get github.com/flopp/go-staticmaps`
 
-You will also need to create your own [IP Stack API Key](https://ipstack.com/plan). It's free and doesn't require a credit card to use. Once you have your key, open `main.go` and paste it into the const variable `ApiKey`  within `main.go`. 
+After getting the required dependencies you can build all go files and execute main.go. At this point a server will open on localhost:8080. From there you can easily execute scans and see their results.
 
 Resulting Map 
 ---
