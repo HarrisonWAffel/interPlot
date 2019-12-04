@@ -16,14 +16,12 @@ import (
 	"time"
 )
 
-const ApiKey = "959279e06d5ca3430cf26fdbca17ea7c"
-
 var scanner *bufio.Scanner
 var cmd *exec.Cmd
 var stdin io.WriteCloser
 var scanning bool
 
-//scanInternet runs the zmap command and outputs a csv file
+//ScanInternet runs the zmap command and outputs a csv file
 func ScanInternet(ctx context.Context, speedLimit string, n string) {
 
 	if scanning == false {
@@ -89,7 +87,7 @@ func StopScan() {
 	log.Println(o)
 }
 
-//getIpLocationsFromAPI is a function that utilizes the ipstack api for ip geolocation. It utilizes a simple curl command to get a json response body containing the desired information.
+//GetIpLocationsFromAPI is a function that utilizes the ipstack api for ip geolocation. It utilizes a simple curl command to get a json response body containing the desired information.
 func GetIpLocationsFromAPI() {
 
 	lines, err := ioutil.ReadFile("results.csv")

@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+//Webpage is a struct that represents the content of the webpage.
 type Webpage struct {
 	Title       string
 	SpeedLimit  int
@@ -103,21 +104,21 @@ func getImg(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println(file.Name())
 	}
-	var output_files = make([]string, x)
+	var outputFiles = make([]string, x)
 	k := 0
 	for _, file := range files {
 		if strings.Contains(file.Name(), "output") {
-			output_files[k] = file.Name()
+			outputFiles[k] = file.Name()
 			k++
 		}
 	}
 
-	sort.Strings(output_files)
-	log.Println(output_files[len(output_files)-1])
-	w.Write([]byte(output_files[len(output_files)-1]))
+	sort.Strings(outputFiles)
+	log.Println(outputFiles[len(outputFiles)-1])
+	w.Write([]byte(outputFiles[len(outputFiles)-1]))
 }
 
-//startserver launches the handlers required for our server and its API.
+//Startserver launches the handlers required for our server and its API.
 func StartServer() {
 	ctx = context.Background()
 	log.Println("Starting Server...")

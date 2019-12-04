@@ -15,7 +15,7 @@ func plotPoints(ips []freegeoip.DefaultQuery) {
 	ctx := sm.NewContext()
 	ctx.SetSize(4000, 3000)
 
-	for i, _ := range ips {
+	for i := range ips {
 		ctx.AddMarker(sm.NewMarker(s2.LatLngFromDegrees(ips[i].Location.Latitude, ips[i].Location.Longitude), color.RGBA{0xff, 0, 0, 0xff}, 16.0))
 		log.Printf("\r%s  %d %s %d %s", "Plotted", i, "out of ", len(ips), "IPS")
 	}
