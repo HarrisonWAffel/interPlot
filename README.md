@@ -1,3 +1,5 @@
+![Go Report Card](https://goreportcard.com/badge/gojp/goreportcard)
+
 # InterPlot
 
 A Golang application that utilizes the networkign utility [Zmap](https://zmap.io/) to plot every reachable IPv4 address in the world. The number of points you can map depends on how long you scan the IPv4 address space, Zmap is known to take ~45 minutes to do this on a normal household connection.
