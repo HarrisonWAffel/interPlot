@@ -118,7 +118,7 @@ func getImg(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(outputFiles[len(outputFiles)-1]))
 }
 
-//Startserver launches the handlers required for our server and its API.
+//StartServer launches the handlers required for our server and its API.
 func StartServer() {
 	ctx = context.Background()
 	log.Println("Starting Server...")

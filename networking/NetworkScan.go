@@ -79,14 +79,6 @@ func ListenToScan() string {
 	return "No Scan Active"
 }
 
-func StopScan() {
-	o, e := stdin.Write([]byte("^c"))
-	if e != nil {
-		log.Println(e)
-	}
-	log.Println(o)
-}
-
 //GetIpLocationsFromAPI is a function that utilizes the ipstack api for ip geolocation. It utilizes a simple curl command to get a json response body containing the desired information.
 func GetIpLocationsFromAPI() {
 
