@@ -1,7 +1,7 @@
 package main
 
-import "./Networking"
+import "./networking"
 
 func main() {
-	Networking.StartServer()
+	networking.StartServer()
 }
