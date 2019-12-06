@@ -1,4 +1,4 @@
-![Go Report Card](https://goreportcard.com/badge/gojp/goreportcard)
+[![Go Report Card](https://goreportcard.com/badge/gojp/goreportcard)](https://goreportcard.com/report/github.com/HarrisonWAffel/interPlot)
 
 # InterPlot
 
