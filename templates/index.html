@@ -54,15 +54,23 @@
             pass=true;
         }
 
+        function updateImg(){
+            fetch("http://localhost:8080/img")
+                .then( response => response.text())
+                .then(data => {
+                    document.getElementById("map").src = data
+                }).catch(err => console.log(err))
+        }
 
 
 
 
-        document.getElementById("map").src="templates/output.png";
         setInterval(updateFoundIPS, 1000);
         setInterval(refreshIPS, 10000);
-        refreshIPS()
+        setInterval(updateImg,  10000);
+        refreshIPS();
         updateFoundIPS();
+        updateImg();
 
 
     </script>
@@ -70,7 +78,7 @@
 <body>
 
 
-<img src="output%3Frandom=323527528432525.24234.png" id="map" alt="Expected output of network scan visualization" >
+<img src="output.png" id="map" alt="Expected output of network scan visualization" >
 
 <div class="sidenav" >
 

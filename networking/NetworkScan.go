@@ -3,9 +3,9 @@ package networking
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/fiorix/freegeoip"
-
 	"io"
 	"io/ioutil"
 	"log"
@@ -118,4 +118,95 @@ func GetIpLocationsFromAPI() {
 	}
 	scanning = false
 	plotPoints(queryResults)
+}
+
+//QueryResult is effectively a touple, with one value being the ip which has been queried, and the result of said query.
+type QueryResult struct {
+	IP    string
+	Query freegeoip.DefaultQuery
+}
+
+//QueryLocationsFromAPI utilizes the freegeoip package to produce an array of details for each IP.
+func QueryIpLocationsFromAPI(ipStrings []string) []QueryResult {
+
+	updateInterval := 24 * time.Hour
+	maxRetryInterval := time.Hour
+	db, err := freegeoip.OpenURL(freegeoip.MaxMindDB, updateInterval, maxRetryInterval)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	select {
+	case <-db.NotifyOpen():
+
+	case err := <-db.NotifyError():
+		log.Fatal(err)
+	}
+
+	queryResults := make([]QueryResult, len(ipStrings))
+
+	for i, e := range ipStrings {
+
+		fmt.Printf("\r%s  %d %s %d %s", "Located", i, "out of ", len(ipStrings), "IPS")
+
+		var result freegeoip.DefaultQuery
+		_ = db.Lookup(net.ParseIP(e), &result)
+
+		queryResults[i] = QueryResult{e, result}
+	}
+
+	return queryResults
+}
+
+//ResultJSON is a struct that contains the core attributes of the freegeoip.DefaultQuery struct which are needed for UI display.
+//This struct is then marshalled and placed into the response body as JSON format.
+type ResultJSON struct {
+	IP        string  `json:"IP"`
+	Continent string  `json:"Continent"`
+	Country   string  `json:"Country"`
+	Region    string  `json:"Region"`
+	City      string  `json:"City"`
+	Latitude  float64 `json:"Latitude"`
+	Longitude float64 `json:"Longitude"`
+	TimeZone  string  `json:"TimeZone"`
+}
+
+//ConvertQueryResultToJSON converts the DefaultScan struct from the freegeoip package to a json string.
+func ConvertQueryResultToJSON(q QueryResult) string {
+
+	//All fields allow nil, however we have to index the Region.
+	//So, to avoid index out of bound errors, we have a simple conditional.
+	JSON := ResultJSON{}
+	if len(q.Query.Region) == 0 {
+		JSON = ResultJSON{
+			IP:        q.IP,
+			Continent: q.Query.Continent.Names["en"],
+			Country:   q.Query.Country.Names["en"],
+			Region:    "",
+			City:      q.Query.City.Names["en"],
+			Latitude:  q.Query.Location.Latitude,
+			Longitude: q.Query.Location.Longitude,
+			TimeZone:  q.Query.Location.TimeZone,
+		}
+	} else {
+		JSON = ResultJSON{
+			IP:        q.IP,
+			Continent: q.Query.Continent.Names["en"],
+			Country:   q.Query.Country.Names["en"],
+			Region:    q.Query.Region[0].Names["en"],
+			City:      q.Query.City.Names["en"],
+			Latitude:  q.Query.Location.Latitude,
+			Longitude: q.Query.Location.Longitude,
+			TimeZone:  q.Query.Location.TimeZone,
+		}
+	}
+
+	ret, err := json.Marshal(JSON)
+	if err != nil {
+		return "204"
+	}
+
+	return string(ret)
+
 }

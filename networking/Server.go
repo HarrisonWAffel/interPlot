@@ -2,11 +2,11 @@ package networking
 
 import (
 	"context"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"sort"
 	"strings"
 )
 
@@ -48,6 +48,8 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		log.Panic("cannot create index template")
 	}
 
+	r.Header.Add("Cache-Control", "no-cache, no-store")
+
 	t.Execute(w, p)
 
 }
@@ -67,7 +69,7 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 	} else if speedLimit != "" && connNum != "" {
 		ScanInternet(nil, speedLimit, connNum)
 	}
-
+	r.Header.Add("Cache-Control", "no-cache, no-store")
 	viewHandler(w, r)
 }
 
@@ -87,35 +89,27 @@ func listFoundIPS(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		w.Write([]byte("No IPS Located"))
 	}
-	ips := string(o)
+	ips := strings.Split(string(o), "\n")
+	g := QueryIpLocationsFromAPI(ips)
+	jsonResponse := "[\n"
+	for i, e := range g {
+		if i == len(g)-1 {
+			jsonResponse += ConvertQueryResultToJSON(e) + "\n"
+		} else {
+			jsonResponse += ConvertQueryResultToJSON(e)
+			jsonResponse += "," + "\n"
+		}
+	}
 
-	w.Write([]byte(ips))
+	jsonResponse += "]"
+
+	fmt.Println(jsonResponse)
+	w.Write([]byte(jsonResponse))
+
 }
 
 func getImg(w http.ResponseWriter, r *http.Request) {
-	files, err := ioutil.ReadDir("./templates")
-	if err != nil {
-		log.Fatal(err)
-	}
-	x := 0
-	for _, file := range files {
-		if strings.Contains(file.Name(), "output") {
-			x++
-		}
-		log.Println(file.Name())
-	}
-	var outputFiles = make([]string, x)
-	k := 0
-	for _, file := range files {
-		if strings.Contains(file.Name(), "output") {
-			outputFiles[k] = file.Name()
-			k++
-		}
-	}
-
-	sort.Strings(outputFiles)
-	log.Println(outputFiles[len(outputFiles)-1])
-	w.Write([]byte(outputFiles[len(outputFiles)-1]))
+	w.Write([]byte("output.png"))
 }
 
 //StartServer launches the handlers required for our server and its API.
