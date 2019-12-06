@@ -126,7 +126,7 @@ type QueryResult struct {
 	Query freegeoip.DefaultQuery
 }
 
-//QueryLocationsFromAPI utilizes the freegeoip package to produce an array of details for each IP.
+//QueryIpLocationsFromAPI utilizes the freegeoip package to produce an array of details for each IP.
 func QueryIpLocationsFromAPI(ipStrings []string) []QueryResult {
 
 	updateInterval := 24 * time.Hour
@@ -177,7 +177,8 @@ func ConvertQueryResultToJSON(q QueryResult) string {
 
 	//All fields allow nil, however we have to index the Region.
 	//So, to avoid index out of bound errors, we have a simple conditional.
-	JSON := ResultJSON{}
+
+	JSON := ResultJSON{nil, nil, nil, nil, nil, nil, nil, nil}
 	if len(q.Query.Region) == 0 {
 		JSON = ResultJSON{
 			IP:        q.IP,
