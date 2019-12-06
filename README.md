@@ -1,17 +1,19 @@
+![Go Report Card](https://goreportcard.com/badge/gojp/goreportcard)
+
 # InterPlot
 
 A Golang application that utilizes the networkign utility [Zmap](https://zmap.io/) to plot every reachable IPv4 address in the world. The number of points you can map depends on how long you scan the IPv4 address space, Zmap is known to take ~45 minutes to do this on a normal household connection.
 
-But beware, the tool can eat up almost all of your bandwidth if you let it.  The current implementation limits the scan speed to 20 Mbps, which for some households can be aggresive. Feel free to modify the value to best fit your network setup. 
+But beware, the tool can eat up almost all of your bandwidth if you let it.  You can specify a limit by passing an integer to the respectively named form located on the web GUI. 
 
 Future Goals
 ---
 
-+  Region specific scans 
++ Region specific scans 
 + Server functionality to allow for continuous mapping 
 + - [x] A more sustainable API solution which scales more readily
 + - [x] A web client to act as the server interface
-+ Document the API calls more heavily and undertake best practices for a golang server.
++ - [x] Document the API calls more heavily and undertake best practices for a golang server.
 
 
 Setup
@@ -31,7 +33,7 @@ Thanks to the awesome [Go-staticmaps](https://github.com/flopp/go-staticmaps) pr
 
 
 #### A Word Of Caution
-As mentioned before, the networking tool used to undertake these IP scans can destroy bandwidth speeds and cripple a network. This project has the scan speed limited to 20Mbps, however this may be aggresive for some areas. To change this value modify the second argument of the zmap exec process call, to whatever value you desire. 
+As mentioned before, the networking tool used to undertake these IP scans can destroy bandwidth speeds and cripple a network. It's easy to set the scan limit by using the web GUI, however for reference it may be useful to know how to set the limit as a command line flag.
 
 For example, 
 
@@ -43,12 +45,12 @@ If we wanted to increase that limit to 20 Mbps it would be changed to
 
 	args := []string{"-B", "20M", "-p", "21", "-n", "700", "-o", "test.csv"}
 	
-<br/>
+
 	
 	
 ---
 External Repositories / APIs used within this project 
 
 [Go-staticmaps](https://github.com/flopp/go-staticmaps), Developed by [flopp](https://github.com/flopp)
-
+[FreeGeoIP](https://github.com/fiorix/freegeoip)
 
