@@ -33,7 +33,7 @@ Thanks to the awesome [Go-staticmaps](https://github.com/flopp/go-staticmaps) pr
 
 
 #### A Word Of Caution
-As mentioned before, the networking tool used to undertake these IP scans can destroy bandwidth speeds and cripple a network. It's easy to set the scan limit by using the web GUI, however for reference it may be useful to know how to set the limit as a command line flag.
+As mentioned before, the networking tool used to undertake these IP scans can destroy bandwidth speeds and cripple a network. It's easy to set the scan limit by using the web GUI, however for reference it may be useful to know how to set the limit directly within the source code.
 
 For example, 
 
