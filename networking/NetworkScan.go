@@ -11,6 +11,7 @@ import (
 	"log"
 	"net"
 	"os"
+
 	"os/exec"
 	"strings"
 	"time"
@@ -21,51 +22,93 @@ var cmd *exec.Cmd
 var stdin io.WriteCloser
 var scanning bool
 
+//QueryResult is effectively a touple, with one value being the ip which has been queried, and the result of said query.
+type QueryResult struct {
+	IP    string
+	Query freegeoip.DefaultQuery
+}
+
+//ResultJSON is a struct that contains the core attributes of the freegeoip.DefaultQuery struct which are needed for UI display.
+//This struct is then marshalled and placed into the response body as JSON format.
+type ResultJSON struct {
+	IP        string  `json:"IP"`
+	Continent string  `json:"Continent"`
+	Country   string  `json:"Country"`
+	Region    string  `json:"Region"`
+	City      string  `json:"City"`
+	Latitude  float64 `json:"Latitude"`
+	Longitude float64 `json:"Longitude"`
+	TimeZone  string  `json:"TimeZone"`
+}
+
+var stop = make(chan bool)
+
 //ScanInternet runs the zmap command and outputs a csv file
 func ScanInternet(ctx context.Context, speedLimit string, n string) {
 
-	if scanning == false {
-		scanning = true
-		log.Println("Scanning")
-		cm := "zmap"
+	go func() {
+		if scanning == false {
+			scanning = true
+			log.Println("Scanning")
+			cm := "zmap"
 
-		args := []string{"-B", strings.TrimSpace(speedLimit) + "M", "-p", "80", "-n", strings.TrimSpace(n), "-o", "results.csv"}
-		fmt.Println(args)
-		cmd = exec.Command(cm, args...)
+			args := []string{"-B", strings.TrimSpace(speedLimit) + "M", "-p", "80", "-n", strings.TrimSpace(n), "-o", "results.csv"}
+			fmt.Println(args)
+			cmd = exec.Command(cm, args...)
 
-		//We need to create a reader for the stderr of this script
-		cmdReader, err := cmd.StderrPipe()
-		if err != nil {
-			fmt.Println("Error creating StderrPipe for Cmd", err)
-			os.Exit(1)
-		}
-
-		defer cmdReader.Close()
-
-		stdn, e := cmd.StdinPipe()
-		if e != nil {
-			log.Fatal("Cannot get stdin pipe ")
-		}
-		stdin = stdn
-
-		//A scanner is created to read the stderr of the above command
-		scanner = bufio.NewScanner(cmdReader)
-
-		go func() {
-			for scanner.Scan() {
-				fmt.Println(scanner.Text())
+			//We need to create a reader for the stderr of this script
+			cmdReader, err := cmd.StderrPipe()
+			if err != nil {
+				fmt.Println("Error creating StderrPipe for Cmd", err)
+				os.Exit(1)
 			}
-			return
-		}()
 
-		err = cmd.Run()
-		if err != nil {
-			log.Fatal("Error starting Cmd ", err)
+			defer cmdReader.Close()
+
+			stdin, err = cmd.StdinPipe()
+			if err != nil {
+				log.Fatal("Cannot get stdin pipe ")
+			}
+
+			//A scanner is created to read the output of the above command
+			scanner = bufio.NewScanner(cmdReader)
+
+			go func(scan bufio.Scanner) {
+				for scan.Scan() {
+					select {
+					case <-stop:
+						scanning = false
+						cmd.Process.Kill()
+					default:
+						fmt.Println(scan.Text())
+					}
+
+				}
+				return
+			}(*scanner)
+
+			err = cmd.Start()
+			if err != nil {
+				log.Fatal("Error starting Cmd ", err)
+			}
+			cmd.Wait()
+			scanner = nil
+			//If we are still scanning at this point we know that the process exited naturally, and therefore we should treat the results as valid.
+			if scanning == true {
+				GetIpLocationsFromAPI()
+			}
+			scanning = false
+
 		}
-		scanner = nil
-		GetIpLocationsFromAPI()
+	}()
 
-	}
+}
+
+//StopScan sends a signal to the stop channel which instructs the scanning goroutines to exit
+func StopScan() {
+	log.Println("Stopping scan...")
+	stop <- true
+	log.Println("scan stopped")
 }
 
 //ListenToScan returns the last line of the current scan.
@@ -120,14 +163,8 @@ func GetIpLocationsFromAPI() {
 	plotPoints(queryResults)
 }
 
-//QueryResult is effectively a touple, with one value being the ip which has been queried, and the result of said query.
-type QueryResult struct {
-	IP    string
-	Query freegeoip.DefaultQuery
-}
-
 //QueryIpLocationsFromAPI utilizes the freegeoip package to produce an array of details for each IP.
-func QueryIpLocationsFromAPI(ipStrings []string) []QueryResult {
+func QueryIpLocationsFromAPI(ctx context.Context, ipStrings []string) []QueryResult {
 
 	updateInterval := 24 * time.Hour
 	maxRetryInterval := time.Hour
@@ -159,26 +196,13 @@ func QueryIpLocationsFromAPI(ipStrings []string) []QueryResult {
 	return queryResults
 }
 
-//ResultJSON is a struct that contains the core attributes of the freegeoip.DefaultQuery struct which are needed for UI display.
-//This struct is then marshalled and placed into the response body as JSON format.
-type ResultJSON struct {
-	IP        string  `json:"IP"`
-	Continent string  `json:"Continent"`
-	Country   string  `json:"Country"`
-	Region    string  `json:"Region"`
-	City      string  `json:"City"`
-	Latitude  float64 `json:"Latitude"`
-	Longitude float64 `json:"Longitude"`
-	TimeZone  string  `json:"TimeZone"`
-}
-
 //ConvertQueryResultToJSON converts the DefaultScan struct from the freegeoip package to a json string.
-func ConvertQueryResultToJSON(q QueryResult) string {
+func ConvertQueryResultToJSON(ctx context.Context, q QueryResult) string {
 
 	//All fields allow nil, however we have to index the Region.
 	//So, to avoid index out of bound errors, we have a simple conditional.
 
-	JSON := ResultJSON{nil, nil, nil, nil, nil, nil, nil, nil}
+	JSON := ResultJSON{"", "", "", "", "", 0., 0., ""}
 	if len(q.Query.Region) == 0 {
 		JSON = ResultJSON{
 			IP:        q.IP,

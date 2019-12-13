@@ -18,8 +18,6 @@ type Webpage struct {
 	Content     []byte
 }
 
-var ctx context.Context
-
 //loadPage loads our index.html and returns its contents as a data structure.
 func loadPage() (*Webpage, error) {
 	filename := "templates/index.html"
@@ -54,26 +52,53 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+var scanCtx, cancel = context.WithCancel(context.Background())
+
 //scanHandler is a handler function that returns the index webpage after starting a zmap scan.
 //It can be started either by visiting the website endpoint, or by sending the parmeters in its header
 func scanHandler(w http.ResponseWriter, r *http.Request) {
 
-	headerScanLimit := w.Header().Get("SpeedLimit")
-	headerNum := w.Header().Get("connNum")
+	headerScanLimit := r.Header.Get("SpeedLimit")
+	headerNum := r.Header.Get("connNum")
 
 	speedLimit := r.FormValue("SpeedLimit")
 	connNum := r.FormValue("connNum")
 
 	if headerScanLimit != "" && headerNum != "" {
-		ScanInternet(nil, headerScanLimit, headerNum)
+		//start the
+		go ScanInternet(scanCtx, headerScanLimit, headerNum)
+
 	} else if speedLimit != "" && connNum != "" {
-		ScanInternet(nil, speedLimit, connNum)
+
+		go ScanInternet(scanCtx, speedLimit, connNum)
+
+	} else {
+
+		//This error checking may not be needed, testing required.
+		_, e := w.Write([]byte("Failed to parse scanLimit and connNum from request"))
+		if e != nil {
+			log.Println("Could send error ")
+			log.Println(e)
+
+		}
+		return
 	}
+	//request that the client doesn't cache any of the images we send them.
+	// this solves the issue of the browser always displaying a cached image
+	// and not the image returned by the server.
 	r.Header.Add("Cache-Control", "no-cache, no-store")
+
 	viewHandler(w, r)
+	//don't leak any child goroutines
+	cancel()
 }
 
 /// API ///
+
+func stopScan(w http.ResponseWriter, r *http.Request) {
+
+	StopScan()
+}
 
 func scanOutput(w http.ResponseWriter, r *http.Request) {
 	_, e := w.Write([]byte(ListenToScan()))
@@ -84,19 +109,19 @@ func scanOutput(w http.ResponseWriter, r *http.Request) {
 }
 
 func listFoundIPS(w http.ResponseWriter, r *http.Request) {
-
+	ctx := context.Background()
 	o, e := ioutil.ReadFile("results.csv")
 	if e != nil {
 		w.Write([]byte("No IPS Located"))
 	}
 	ips := strings.Split(string(o), "\n")
-	g := QueryIpLocationsFromAPI(ips)
+	g := QueryIpLocationsFromAPI(ctx, ips)
 	jsonResponse := "[\n"
 	for i, e := range g {
 		if i == len(g)-1 {
-			jsonResponse += ConvertQueryResultToJSON(e) + "\n"
+			jsonResponse += ConvertQueryResultToJSON(ctx, e) + "\n"
 		} else {
-			jsonResponse += ConvertQueryResultToJSON(e)
+			jsonResponse += ConvertQueryResultToJSON(ctx, e)
 			jsonResponse += "," + "\n"
 		}
 	}
@@ -112,15 +137,17 @@ func getImg(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("output.png"))
 }
 
-//StartServer launches the handlers required for our server and its API.
+//StartServer listens on localhost:8080 and monitors the handlers required for our server and its API.
 func StartServer() {
-	ctx = context.Background()
+
+	mux := http.NewServeMux()
 	log.Println("Starting Server...")
-	http.Handle("/", http.FileServer(http.Dir("./templates")))
-	http.HandleFunc("/scan", scanHandler)
-	http.HandleFunc("/scanoutput", scanOutput)
-	http.HandleFunc("/listfoundips", listFoundIPS)
-	http.HandleFunc("/img", getImg)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	mux.Handle("/", http.FileServer(http.Dir("./templates")))
+	mux.HandleFunc("/scan", scanHandler)
+	mux.HandleFunc("/stopscan", stopScan)
+	mux.HandleFunc("/scanoutput", scanOutput)
+	mux.HandleFunc("/listfoundips", listFoundIPS)
+	mux.HandleFunc("/img", getImg)
+	log.Fatal(http.ListenAndServe(":8080", mux))
 
 }

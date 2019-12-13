@@ -20,17 +20,18 @@ func plotPoints(ips []freegeoip.DefaultQuery) {
 		log.Printf("\r%s  %d %s %d %s", "Plotted", i, "out of ", len(ips), "IPS")
 	}
 
-	log.Println()
 	log.Println("Rendering Image...")
 	img, err := ctx.Render()
 	if err != nil {
-		panic(err)
+		log.Println("Could not render IP locations.")
+		log.Println(err)
 	}
 
 	log.Println("Saving Image...")
 
 	if err := gg.SavePNG("templates/output.png", img); err != nil {
-		panic(err)
+		log.Println("Could not save generated image ")
+		log.Println(err)
 	}
 
 	log.Println("Imaged Saved! Done.")
