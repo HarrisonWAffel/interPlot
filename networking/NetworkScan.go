@@ -73,7 +73,8 @@ func ScanInternet(ctx context.Context, speedLimit string, n string) {
 			//A scanner is created to read the output of the above command
 			scanner = bufio.NewScanner(cmdReader)
 
-			go func(scan bufio.Scanner) {
+			//pass a pointer to our scanner so we can log the output without blocking
+			go func(scan *bufio.Scanner) {
 				for scan.Scan() {
 					select {
 					case <-stop:
@@ -85,7 +86,7 @@ func ScanInternet(ctx context.Context, speedLimit string, n string) {
 
 				}
 				return
-			}(*scanner)
+			}(scanner)
 
 			err = cmd.Start()
 			if err != nil {
@@ -198,9 +199,6 @@ func QueryIpLocationsFromAPI(ctx context.Context, ipStrings []string) []QueryRes
 
 //ConvertQueryResultToJSON converts the DefaultScan struct from the freegeoip package to a json string.
 func ConvertQueryResultToJSON(ctx context.Context, q QueryResult) string {
-
-	//All fields allow nil, however we have to index the Region.
-	//So, to avoid index out of bound errors, we have a simple conditional.
 
 	JSON := ResultJSON{"", "", "", "", "", 0., 0., ""}
 	if len(q.Query.Region) == 0 {

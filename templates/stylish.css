@@ -11,6 +11,7 @@
     overflow-x: hidden;
 }
 
+
 .title{
     color: white;
     position: relative;
@@ -20,6 +21,7 @@
     text-align: center;
     margin-top: 15%;
     border: solid 1px;
+    padding: 10px;
 
 }
 .formName {
@@ -42,6 +44,9 @@
     border: solid 1px;
 }
 
+.output{
+    border: 10px;
+}
 
 .button {
     font-size: 25px;
@@ -60,7 +65,7 @@
 .sidenav form  {
     text-decoration: none;
     float:right;
-    padding-right: 0px;
+    padding-right: 10px;
     padding-top: 25px;
     color: #000000;
     display: inline-block;
@@ -73,6 +78,7 @@
 
 .sidenav input {
     margin-top: 200px;
+    margin-right: 40px;
 }
 
 .sidenav textarea {

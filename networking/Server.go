@@ -2,7 +2,6 @@ package networking
 
 import (
 	"context"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -98,6 +97,7 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 func stopScan(w http.ResponseWriter, r *http.Request) {
 
 	StopScan()
+	w.Write([]byte("Scan Stopped."))
 }
 
 func scanOutput(w http.ResponseWriter, r *http.Request) {
@@ -128,7 +128,6 @@ func listFoundIPS(w http.ResponseWriter, r *http.Request) {
 
 	jsonResponse += "]"
 
-	fmt.Println(jsonResponse)
 	w.Write([]byte(jsonResponse))
 
 }

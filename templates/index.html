@@ -62,6 +62,13 @@
                 }).catch(err => console.log(err))
         }
 
+        function stopscan(){
+            fetch("http://localhost:8080/stopscan")
+                .then(res => res.text())
+                .then( d => {
+                   document.getElementById("cat").innerText = d
+                });
+        }
 
 
 
@@ -95,15 +102,17 @@
 
         <form action="/scan" method="POST" >
             <div>
-                <textarea  name="SpeedLimit" rows="1" cols="50"></textarea>
+                <textarea class="input" name="SpeedLimit" rows="1" cols="50"></textarea>
             </div>
 
             <div>
-                <textarea  name="connNum" rows="1" cols="50"></textarea>
+                <textarea  class="input" name="connNum" rows="1" cols="50"></textarea>
             </div>
             <input type="submit" value="Start Scan" style="margin-top: -90%" >
+
         </form>
 
+            <input type="submit"  value="Stop Scan" style="margin-top: 143px; margin-left: 90px; position: absolute" >
 
         <form class = "output">
             <p class="cat" id = "cat"  >
