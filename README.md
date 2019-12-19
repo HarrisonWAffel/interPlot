@@ -51,5 +51,6 @@ If we wanted to increase that limit to 20 Mbps it would be changed to
 External Repositories / APIs used within this project 
 
 [Go-staticmaps](https://github.com/flopp/go-staticmaps), Developed by [flopp](https://github.com/flopp)
+
 [FreeGeoIP](https://github.com/fiorix/freegeoip)
 
