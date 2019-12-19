@@ -10,7 +10,6 @@ Future Goals
 ---
 
 + Region specific scans 
-+ Server functionality to allow for continuous mapping 
 + - [x] A more sustainable API solution which scales more readily
 + - [x] A web client to act as the server interface
 + - [x] Document the API calls more heavily and undertake best practices for a golang server.
