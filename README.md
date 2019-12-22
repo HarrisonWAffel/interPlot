@@ -10,9 +10,9 @@ Future Goals
 ---
 
 + Region specific scans 
-+ - [x] A more sustainable API solution which scales more readily
++ - [x] A more sustainable API solution which scales 
 + - [x] A web client to act as the server interface
-+ - [x] Document the API calls more heavily and undertake best practices for a golang server.
++ - [x] Document the API calls more carefully and undertake best practices for a golang server.
 
 
 Setup
@@ -29,22 +29,6 @@ Thanks to the awesome [Go-staticmaps](https://github.com/flopp/go-staticmaps) pr
 
 
 ![Alt text](templates/goodexample.png?raw=true "Example Map")
-
-
-#### A Word Of Caution
-As mentioned before, the networking tool used to undertake these IP scans can destroy bandwidth speeds and cripple a network. It's easy to set the scan limit by using the web GUI, however for reference it may be useful to know how to set the limit directly within the source code.
-
-For example, 
-
-A scan limited to 2 Mbps would look like such
-
-      args := []string{"-B", "2M", "-p", "21", "-n", "700", "-o", "test.csv"}
-
-If we wanted to increase that limit to 20 Mbps it would be changed to 
-
-	args := []string{"-B", "20M", "-p", "21", "-n", "700", "-o", "test.csv"}
-	
-
 	
 	
 ---
